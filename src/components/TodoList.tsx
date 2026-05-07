@@ -2,7 +2,7 @@ import "./TodoList.css";
 import TodoItem from "./TodoItem";
 import { type Todo } from "../App";
 import { useMemo, useState, type ChangeEvent } from "react";
-import TodoContext from "../TodoContext";
+import { TodoStateContext } from "../TodoContext";
 import { useContext } from "react";
 
 // interface TodoListProps {
@@ -13,7 +13,7 @@ import { useContext } from "react";
 
 function TodoList() {
   const [search, setSearch] = useState("");
-  const { todos, onUpdate, onDelete } = useContext(TodoContext);
+  const { todos } = useContext(TodoStateContext);
 
   const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);

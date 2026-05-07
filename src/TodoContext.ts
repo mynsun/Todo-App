@@ -1,18 +1,37 @@
 import type { Todo } from "./App";
 import { createContext } from "react";
 
-interface TodoContextType {
+// interface TodoContextType {
+//   todos: Todo[];
+//   onCreate: (content: string) => void;
+//   onUpdate: (id: number) => void;
+//   onDelete: (id: number) => void;
+// }
+
+// const TodoContext = createContext<TodoContextType>({
+//   todos: [],
+//   onCreate: (content: string) => {},
+//   onUpdate: (id: number) => {},
+//   onDelete: (id: number) => {},
+// });
+
+// export default TodoContext;
+
+interface TodoStateContextType {
   todos: Todo[];
+}
+
+interface TodoDispatchContextType {
   onCreate: (content: string) => void;
   onUpdate: (id: number) => void;
   onDelete: (id: number) => void;
 }
 
-const TodoContext = createContext<TodoContextType>({
+export const TodoStateContext = createContext<TodoStateContextType>({
   todos: [],
+});
+export const TodoDispatchContextType = createContext<TodoDispatchContextType>({
   onCreate: (content: string) => {},
   onUpdate: (id: number) => {},
   onDelete: (id: number) => {},
 });
-
-export default TodoContext;

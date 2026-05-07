@@ -1,7 +1,7 @@
 import "./TodoItem.css";
 import { type Todo } from "../App.tsx";
 import React from "react";
-import TodoContext from "../TodoContext.ts";
+import { TodoDispatchContextType } from "../TodoContext.ts";
 import { useContext } from "react";
 
 interface TodoItemProps {
@@ -10,7 +10,7 @@ interface TodoItemProps {
 
 function TodoItem({ todo }: TodoItemProps) {
   console.log(`${todo.id} TodoItem 업데이트`);
-  const { onUpdate, onDelete } = useContext(TodoContext);
+  const { onUpdate, onDelete } = useContext(TodoDispatchContextType);
   const onChangeCheckbox = () => {
     onUpdate(todo.id);
   };

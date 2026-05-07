@@ -1,9 +1,9 @@
 import React, { useContext, useRef, useState } from "react";
 import "./TodoEditor.css";
-import TodoContext from "../TodoContext";
+import { TodoDispatchContextType } from "../TodoContext";
 
 function TodoEditor() {
-  const { onCreate } = useContext(TodoContext);
+  const { onCreate } = useContext(TodoDispatchContextType);
   const [content, setContent] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
   const onChangeContent = (e: React.ChangeEvent<HTMLInputElement>) => {

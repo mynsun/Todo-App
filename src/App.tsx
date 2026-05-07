@@ -1,30 +1,9 @@
-import { useCallback, useReducer, useRef, useState } from "react";
+import { useCallback, useReducer, useRef, useState, useMemo } from "react";
 import "./App.css";
 import Header from "./components/Header";
 import TodoEditor from "./components/TodoEditor";
 import TodoList from "./components/TodoList";
-import TodoContext from "./TodoContext";
-
-const mockTodos = [
-  {
-    id: 0,
-    isDone: false,
-    content: "Javascript 공부하기",
-    createDate: new Date().getTime(),
-  },
-  {
-    id: 1,
-    isDone: false,
-    content: "AI 공부하기",
-    createDate: new Date().getTime(),
-  },
-  {
-    id: 2,
-    isDone: false,
-    content: "React 공부하기",
-    createDate: new Date().getTime(),
-  },
-];
+import { TodoStateContext, TodoDispatchContextType } from "./TodoContext";
 
 export interface Todo {
   id: number;
@@ -39,28 +18,38 @@ type Action =
   | { type: "DELETE"; targetId: number };
 
 function reducer(todos: Todo[], action: Action) {
+  let result: Todo[];
   switch (action.type) {
     case "CREATE": {
-      return [action.newItem, ...todos];
+      result = [action.newItem, ...todos];
+      break;
     }
     case "UPDATE": {
-      return todos.map((todo) =>
+      result = todos.map((todo) =>
         todo.id === action.targetId ? { ...todo, isDone: !todo.isDone } : todo,
       );
+      break;
     }
     case "DELETE": {
-      return todos.filter((todo) => todo.id !== action.targetId);
+      result = todos.filter((todo) => todo.id !== action.targetId);
+      break;
     }
     default:
-      return todos;
+      result = todos;
   }
+  localStorage.setItem("todos", JSON.stringify(result));
+  return result;
 }
-function App() {
-  // const [todos, setTodos] = useState<Todo[]>(mockTodos);
-  const [todos, dispatch] = useReducer(reducer, mockTodos);
-  const idRef = useRef(3);
 
-  const onCreate = (content: string) => {
+function App() {
+  const stored = localStorage.getItem("todos");
+  const initTodos: Todo[] = stored ? JSON.parse(stored) : [];
+
+  const [todos, dispatch] = useReducer(reducer, initTodos);
+  const initId = Number(localStorage.getItem("todoId") ?? 1);
+  const idRef = useRef(initId);
+
+  const onCreate = useCallback((content: string) => {
     const newItem = {
       id: idRef.current,
       content,
@@ -69,7 +58,8 @@ function App() {
     };
     dispatch({ type: "CREATE", newItem });
     idRef.current += 1;
-  };
+    localStorage.setItem("todoId", JSON.stringify(idRef.current));
+  }, []);
 
   const onUpdate = useCallback((targetId: number) => {
     dispatch({ type: "UPDATE", targetId });
@@ -78,13 +68,23 @@ function App() {
   const onDelete = useCallback((targetId: number) => {
     dispatch({ type: "DELETE", targetId });
   }, []);
+
+  const dispatches = useMemo(
+    () => ({ onCreate, onUpdate, onDelete }),
+    [onCreate, onUpdate, onDelete],
+  );
+
   return (
     <div className="App">
       <Header />
-      <TodoContext.Provider value={{ todos, onCreate, onUpdate, onDelete }}>
-        <TodoEditor />
-        <TodoList />
-      </TodoContext.Provider>
+      <TodoStateContext.Provider value={{ todos }}>
+        <TodoDispatchContextType.Provider
+          value={{ onCreate, onUpdate, onDelete }}
+        >
+          <TodoEditor />
+          <TodoList />
+        </TodoDispatchContextType.Provider>
+      </TodoStateContext.Provider>
     </div>
   );
 }
